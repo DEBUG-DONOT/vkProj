@@ -1,5 +1,3 @@
-
-#define VOLK_IMPLEMENTATION
 #define GLFW_INCLUDE_NONE
 
 #include "volk.h"
@@ -15,6 +13,7 @@ int main() {
         app.run();
     } catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;
+        system("pause");
         return EXIT_FAILURE;
     }
 

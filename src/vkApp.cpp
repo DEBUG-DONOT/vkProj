@@ -1,9 +1,12 @@
 #include "vkApp.h"
+
 #include <iostream>
 void VulkanApp::run()
 {
 	initWindow();
 	initVulkan();
+	initVulkanInstance();
+	
 	mainLoop();
 	cleanUp();
 }
@@ -24,6 +27,12 @@ void VulkanApp::initVulkan()
 	std::cout << "VulkanApp::Init vulkan function" << std::endl;
 }
 
+void VulkanApp::initVulkanInstance()
+{
+	std::cout << "VulkanApp::Init vulkan instance function" << std::endl;
+	this->vkInstance.CreateVulkanInstance();
+}
+
 void VulkanApp::mainLoop()
 {
 	//主循环
@@ -37,6 +46,8 @@ void VulkanApp::cleanUp()
 {
 	//清理资源
 	//清理glfw
+	this->vkInstance.DestroyVulkanInstance();
+
 	glfwDestroyWindow(window);
 	glfwTerminate();
 }

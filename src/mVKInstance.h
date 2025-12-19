@@ -12,8 +12,9 @@ public:
 	void DestroyVulkanInstance();
 private:
 	void InitDefaultVKInstanceCreateInfo();
+	void CheckVulkanExtensionSupport();
 private:
-	VkInstance mVKInstance=nullptr;
+	VkInstance mVKInstance;
 	VkInstanceCreateInfo mDefaultVKInstanceCreateInfo{};
 	VkApplicationInfo mDefaultVKApplicationInfo{};
 };

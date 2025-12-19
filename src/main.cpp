@@ -7,6 +7,11 @@
 #include "vkApp.h"
 
 int main() {
+    if (volkInitialize() != VK_SUCCESS) {
+        std::cerr << "Failed to initialize volk!" << std::endl;
+        return EXIT_FAILURE;
+    }
+    std::cout << "Volk initialized successfully." << std::endl;
     VulkanApp app;
 
     try {

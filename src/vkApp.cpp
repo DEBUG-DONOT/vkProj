@@ -20,6 +20,12 @@ void VulkanApp::initWindow()
 	//glfw create window
 	window = glfwCreateWindow(VulkanApp::WIDTH, VulkanApp::HEIGHT, "Vulkan Window", nullptr, nullptr);
 	std::cout << "VulkanApp::Init Window function" << std::endl;
+	uint32_t extensionCount = 0;
+	const char** extensions = glfwGetRequiredInstanceExtensions(&extensionCount);
+	std::cout << "Required GLFW extensions:" << std::endl;
+	for (uint32_t i = 0; i < extensionCount; i++) {
+		std::cout << "\t" << extensions[i] << std::endl;
+	}
 }
 
 void VulkanApp::initVulkan()

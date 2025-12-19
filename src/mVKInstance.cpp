@@ -1,6 +1,5 @@
 #include "mVKInstance.h"
 #include <iostream>
-#include <vector>
 void mVKInstace::CreateVulkanInstance(VkInstanceCreateInfo _vkInstanceCreateInfo)
 {
     //几乎所有的vulkan的create函数都返回VkResult类型，并且都需要一个structure作为参数传递信息，接受一个指针作为alloctor，还有一个输出指针
@@ -10,6 +9,7 @@ void mVKInstace::CreateVulkanInstance(VkInstanceCreateInfo _vkInstanceCreateInfo
     if (result != VK_SUCCESS) {
         std::cerr << "Failed to create Vulkan instance!" << std::endl;
     }
+    //CheckVulkanExtensionSupport();
 }
 
 void mVKInstace::CreateVulkanInstance()
@@ -17,10 +17,10 @@ void mVKInstace::CreateVulkanInstance()
     //使用默认的createinfo来创建vkinstance
     InitDefaultVKInstanceCreateInfo();
     VkResult result = vkCreateInstance(&this->mDefaultVKInstanceCreateInfo, nullptr, &this->mVKInstance);//mVKInstance是空指针
-    if (result != VK_SUCCESS) {
+if (result != VK_SUCCESS) {
         std::cerr << "Failed to create Vulkan instance!" << std::endl;
-    }
-    CheckVulkanExtensionSupport();
+    }   
+   // CheckVulkanExtensionSupport();
 }
 
 void mVKInstace::DestroyVulkanInstance()
@@ -31,6 +31,7 @@ void mVKInstace::DestroyVulkanInstance()
 
 void mVKInstace::InitDefaultVKInstanceCreateInfo()
 {
+    //TODO：改为使用临时变量，不使用成员变量
     //初始化默认的vkinstancecreateinfo结构体
     //app info
     this->mDefaultVKApplicationInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -46,8 +47,23 @@ void mVKInstace::InitDefaultVKInstanceCreateInfo()
     this->mDefaultVKInstanceCreateInfo.flags = 0;
     this->mDefaultVKInstanceCreateInfo.pApplicationInfo = &this->mDefaultVKApplicationInfo;
     //验证层相关
-    this->mDefaultVKInstanceCreateInfo.enabledLayerCount = 0;
-    this->mDefaultVKInstanceCreateInfo.ppEnabledLayerNames = nullptr;
+    if(mbEnableValidationLayers)
+    {
+        const std::vector<const char*> validationLayers = {
+            "VK_LAYER_KHRONOS_validation"
+        };
+        if (!CheckVulkanLayerSupport(validationLayers, static_cast<uint32_t>(validationLayers.size()))) {
+            std::cerr << "Validation layers requested, but not available!" << std::endl;
+            mbEnableValidationLayers = false;
+        }
+        this->mDefaultVKInstanceCreateInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
+        this->mDefaultVKInstanceCreateInfo.ppEnabledLayerNames = validationLayers.data();
+    }
+    else
+    {
+        this->mDefaultVKInstanceCreateInfo.enabledLayerCount = 0;
+        this->mDefaultVKInstanceCreateInfo.ppEnabledLayerNames = nullptr;
+    }
     //启用拓展  
     this->mDefaultVKInstanceCreateInfo.enabledExtensionCount = 0;
     this->mDefaultVKInstanceCreateInfo.ppEnabledExtensionNames = nullptr;//指向扩展名字符串数组的指针
@@ -64,5 +80,27 @@ void mVKInstace::CheckVulkanExtensionSupport()
     for (const auto& extension : extensions) {
         std::cout << "\t" << extension.extensionName << std::endl;
     }
+}
 
+bool mVKInstace::CheckVulkanLayerSupport(std::vector<const char *> _layerNames, uint32_t _layerCount)
+{
+     uint32_t extensionCount = 0;
+    vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
+    std::vector<VkExtensionProperties> extensions(extensionCount);
+    vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, extensions.data());
+    //std::cout << "Available Vulkan extensions:" << std::endl;
+    // for (const auto& extension : extensions) {
+    //     std::cout << "\t" << extension.extensionName << std::endl;
+    // }
+    for(auto layerName:extensions)
+    {
+        for(uint32_t i=0;i<_layerCount;i++)
+        {
+            if(strcmp(layerName.extensionName,_layerNames[i])!=0)
+            {
+                return false;
+            }
+        }
+    }
+    return true;
 }

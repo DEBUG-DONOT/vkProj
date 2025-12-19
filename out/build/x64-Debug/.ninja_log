@@ -1,4 +1,0 @@
-# ninja log v6
-8	69	7874868194315986	CMakeFiles/HelloVulkan.dir/src/main.cpp.obj	5ed989f8b595ccc5
-14	141	7874868194371080	CMakeFiles/HelloVulkan.dir/volk/volk.c.obj	d8c8c0230a3c5fd2
-141	821	7874868195640840	HelloVulkan.exe	972ca2a08e92517b

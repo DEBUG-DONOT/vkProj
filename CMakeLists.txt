@@ -1,62 +1,69 @@
 cmake_minimum_required(VERSION 3.15)
-project(HelloVulkan)
 
-# --- 1. 基础设置 ---
-# Windows 编码修正
-if (MSVC)
-    add_compile_options(/utf-8)
+# 1. 编码与环境变量处理 (针对不同编译器前端)
+if (MSVC OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    # 针对 MSVC 环境下的 Clang (clang-cl) 强制 UTF-8 输出
+    set(ENV{CL} "$ENV{CL} /utf-8")
 endif()
 
-# C++ 标准
+project(HelloVulkan)
+
+# 2. 设置 C++ 标准
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# --- 2. 寻找依赖 ---
-# 2.1 Vulkan
+# 3. 编译器特定选项处理
+if (MSVC)
+    add_compile_options(/utf-8)
+elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+    # Clang 和 GCC 的编码设置
+    add_compile_options(-finput-charset=UTF-8 -fexec-charset=UTF-8)
+    # 建议：利用 Clang 强大的警告功能，帮助发现 Vulkan 调用中的潜在逻辑问题
+    add_compile_options(-Wall -Wextra -Wno-unused-parameter)
+endif()
+
+# 4. 自动寻找 Vulkan SDK
 find_package(Vulkan REQUIRED)
 
-# 2.2 GLFW (设置路径变量，方便后面引用)
+# 5. GLFW 配置 (重点：库路径适配)
 set(GLFW_PATH "${CMAKE_SOURCE_DIR}/libs/glfw")
-# 指向 GLFW 的 include 目录
 set(GLFW_INCLUDE_DIR "${GLFW_PATH}/include")
-# 指向 GLFW 的 .lib 文件 (注意：这里选 glfw3dll.lib 以配合 DLL 模式)
-set(GLFW_LIB "${GLFW_PATH}/lib-vc2022/glfw3dll.lib")
 
-# 2.3 Volk (最简单的集成方式：直接把 volk.c 当源代码编译)
-# 这样你不需要 volk 文件夹里有 CMakeLists.txt
-set(VOLK_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/volk")
-set(VOLK_SOURCE "${CMAKE_SOURCE_DIR}/volk/volk.c")
+# 判断编译器类型以选择正确的 GLFW 库版本
+if (MSVC OR (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND WIN32))
+    # Windows 上的 Clang (通常是 clang-cl) 兼容 MSVC 的 .lib 文件
+    set(GLFW_LIB "${GLFW_PATH}/lib-vc2022/glfw3dll.lib")
+    set(GLFW_DLL "${GLFW_PATH}/lib-vc2022/glfw3.dll")
+elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+    # 如果你切换到 MinGW (GCC)，则需要使用 .a 文件
+    set(GLFW_LIB "${GLFW_PATH}/lib-mingw-w64/libglfw3dll.a")
+    set(GLFW_DLL "${GLFW_PATH}/lib-mingw-w64/glfw3.dll")
+endif()
 
-# --- 3. 定义可执行文件 ---
+# 6. 定义可执行文件
 add_executable(HelloVulkan 
     src/main.cpp 
     src/vkApp.cpp
     src/mVKInstance.cpp
-    # 把 volk.c 加进来一起编译
-    ${VOLK_SOURCE} 
 )
 
-# --- 4. 头文件路径 ---
+# 7. 头文件路径
 target_include_directories(HelloVulkan PRIVATE
-    "${CMAKE_SOURCE_DIR}/src"  # 修复了硬编码路径
-    ${GLFW_INCLUDE_DIR}        # GLFW 头文件
-    ${VOLK_INCLUDE_DIR}        # Volk 头文件
+    "${CMAKE_SOURCE_DIR}/src"
+    ${GLFW_INCLUDE_DIR}
+    ${Vulkan_INCLUDE_DIRS}
 )
 
-# --- 5. 链接库 ---
+# 8. 链接库
 target_link_libraries(HelloVulkan PRIVATE
     Vulkan::Vulkan
-    ${GLFW_LIB}  # 直接链接具体的 lib 文件，比 link_directories 更安全
+    ${GLFW_LIB}
 )
 
-# --- 6. 定义宏 (可选) ---
-# 告诉 GLFW 我们在使用 DLL 版本 (虽然对于 client 没强制要求，但写上更好)
-target_compile_definitions(HelloVulkan PRIVATE GLFW_DLL)
-
-# --- 7. 后处理：拷贝 DLL ---
+# 9. 拷贝 DLL 到输出目录 (保持运行环境完整)
 add_custom_command(TARGET HelloVulkan POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
-    "${GLFW_PATH}/lib-vc2022/glfw3.dll"
+    "${GLFW_DLL}"
     $<TARGET_FILE_DIR:HelloVulkan>
-    COMMENT "Copying GLFW DLL to output directory..."
+    COMMENT "Copying GLFW DLL to execution directory..."
 )

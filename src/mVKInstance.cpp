@@ -39,6 +39,7 @@ void mVKInstace::InitDefaultVKInstanceCreateInfo()
     //初始化默认的vkinstancecreateinfo结构体
     //app info
     this->mDefaultVKApplicationInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+    //this->mDefaultVKApplicationInfo.sType = VK_STRUCTURE_TYPE_CALIBRATED_TIMESTAMP_INFO_EXT;
     this->mDefaultVKApplicationInfo.pNext = nullptr;
     this->mDefaultVKApplicationInfo.pApplicationName = "VulkanApp";
     this->mDefaultVKApplicationInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
@@ -93,14 +94,19 @@ bool mVKInstace::CheckVulkanLayerSupport(std::vector<const char *> _layerNames, 
     for (const auto& _layer : availableLayers) {
         std::cout << "\t" << _layer.layerName << std::endl;
     }
-    for(auto layerName:availableLayers)
-    {
-        for(uint32_t i=0;i<_layerCount;i++)
-        {
-            if(strcmp(layerName.layerName,_layerNames[i])!=0)
-            {
-                return false;
+// 2. 修正逻辑：外层循环遍历“请求的层”，内层遍历“可用的层”
+    for (uint32_t i = 0; i < _layerCount; i++) {
+        bool layerFound = false;
+
+        for (const auto& layerProperties : availableLayers) {
+            if (strcmp(_layerNames[i], layerProperties.layerName) == 0) {
+                layerFound = true;
+                break;
             }
+        }
+
+        if (!layerFound) {
+            return false; // 只要有一个请求的层没找到，才返回 false
         }
     }
     return true;

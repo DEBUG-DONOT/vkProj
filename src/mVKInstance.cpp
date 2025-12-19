@@ -1,5 +1,9 @@
 #include "mVKInstance.h"
 #include <iostream>
+
+static const std::vector<const char*> validationLayers = {
+            "VK_LAYER_KHRONOS_validation"};
+
 void mVKInstace::CreateVulkanInstance(VkInstanceCreateInfo _vkInstanceCreateInfo)
 {
     //几乎所有的vulkan的create函数都返回VkResult类型，并且都需要一个structure作为参数传递信息，接受一个指针作为alloctor，还有一个输出指针
@@ -49,9 +53,6 @@ void mVKInstace::InitDefaultVKInstanceCreateInfo()
     //验证层相关
     if(mbEnableValidationLayers)
     {
-        const std::vector<const char*> validationLayers = {
-            "VK_LAYER_KHRONOS_validation"
-        };
         if (!CheckVulkanLayerSupport(validationLayers, static_cast<uint32_t>(validationLayers.size()))) {
             std::cerr << "Validation layers requested, but not available!" << std::endl;
             mbEnableValidationLayers = false;
@@ -84,19 +85,19 @@ void mVKInstace::CheckVulkanExtensionSupport()
 
 bool mVKInstace::CheckVulkanLayerSupport(std::vector<const char *> _layerNames, uint32_t _layerCount)
 {
-     uint32_t extensionCount = 0;
-    vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
-    std::vector<VkExtensionProperties> extensions(extensionCount);
-    vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, extensions.data());
-    //std::cout << "Available Vulkan extensions:" << std::endl;
-    // for (const auto& extension : extensions) {
-    //     std::cout << "\t" << extension.extensionName << std::endl;
-    // }
-    for(auto layerName:extensions)
+    uint32_t layerCount;
+    vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
+    std::vector<VkLayerProperties> availableLayers(layerCount);
+    vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
+    std::cout << "Available Vulkan layer:" << std::endl;
+    for (const auto& _layer : availableLayers) {
+        std::cout << "\t" << _layer.layerName << std::endl;
+    }
+    for(auto layerName:availableLayers)
     {
         for(uint32_t i=0;i<_layerCount;i++)
         {
-            if(strcmp(layerName.extensionName,_layerNames[i])!=0)
+            if(strcmp(layerName.layerName,_layerNames[i])!=0)
             {
                 return false;
             }

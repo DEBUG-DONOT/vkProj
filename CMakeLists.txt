@@ -46,6 +46,7 @@ add_executable(HelloVulkan
     src/vkApp.cpp
     src/mVKInstance.cpp
     src/mVKPhysicalDevice.cpp
+    src/mVKLogicalDevice.cpp
     src/utils.h
 )
 

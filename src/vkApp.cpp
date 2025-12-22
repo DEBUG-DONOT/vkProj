@@ -39,6 +39,18 @@ void VulkanApp::initVulkanInstance()
 	this->vkInstance.CreateVulkanInstance();
 }
 
+void VulkanApp::pickPhysicalDevice()
+{
+	this->vkPhysicalDevice.PickPhysicalDevice(this->vkInstance.GetVulkanInstance());
+	this->vkPhysicalDevice.FindQueueFamilies(this->vkPhysicalDevice.GetPhysicalDevice());
+}
+
+void VulkanApp::createLogicalDevice()
+{
+	MyQueueFamilyIndices indices = this->vkPhysicalDevice.FindQueueFamilies(this->vkPhysicalDevice.GetPhysicalDevice());
+	this->vkLogicalDevice.CreateLogicalDevice(indices, this->vkPhysicalDevice.GetPhysicalDevice());
+}
+
 void VulkanApp::mainLoop()
 {
 	//主循环

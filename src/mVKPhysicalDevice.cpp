@@ -34,26 +34,26 @@ uint32_t mVKPhysicalDevice::RatePhysicalDevice(VkPhysicalDevice _device)
 {
     //对物理设备进行评分
     //实际上是对物理设备的features和properties进行查询
-    VkPhysicalDeviceProperties2 deviceProperties{};
-    VkPhysicalDeviceFeatures2 deviceFeatures{};
-    vkGetPhysicalDeviceProperties2KHR(_device, &deviceProperties);
-    vkGetPhysicalDeviceFeatures2KHR(_device, &deviceFeatures);
+    VkPhysicalDeviceProperties deviceProperties{};
+    VkPhysicalDeviceFeatures deviceFeatures{};
+    vkGetPhysicalDeviceProperties(_device, &deviceProperties);
+    vkGetPhysicalDeviceFeatures(_device, &deviceFeatures);
     uint32_t score = 0;
     if(_device!=VK_NULL_HANDLE)
     {
         score+=1;
     }
     //如果是独显
-    if(deviceProperties.properties.deviceType==VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
+    if(deviceProperties.deviceType==VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
     {
         score+=1000;
     }
     //检查VR的multiviewport支持
-    if(deviceFeatures.features.multiViewport)
+    if(deviceFeatures.multiViewport)
     {
         score+=500;
     }
-    std::cout<<"Physical Device Name: "<<deviceProperties.properties.deviceName<<" Physical Device Score: "<<score<<std::endl;
+    std::cout<<"Physical Device Name: "<<deviceProperties.deviceName<<" Physical Device Score: "<<score<<std::endl;
     return score;
 
 }

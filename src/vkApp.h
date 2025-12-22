@@ -2,7 +2,8 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 #include "mVKInstance.h"
-
+#include "mVKPhysicalDevice.h"
+#include "mVKLogicalDevice.h"
 class VulkanApp
 {
 public:
@@ -13,7 +14,8 @@ private:
 	void initWindow();
 	void initVulkan();
 	void initVulkanInstance();
-	
+	void pickPhysicalDevice();
+	void createLogicalDevice();
 	void mainLoop();
 	void cleanUp();
 	
@@ -24,4 +26,6 @@ private:
 
 private:
     mVKInstace vkInstance;//Vulkan实例封装类
+	mVKPhysicalDevice vkPhysicalDevice;//物理设备封装类
+	mVKLogicalDevice vkLogicalDevice;//逻辑设备封装类
 };

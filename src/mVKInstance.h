@@ -15,6 +15,7 @@ public:
 	void CreateVulkanInstance(VkInstanceCreateInfo _vkInstanceCreateInfo);
 	void CreateVulkanInstance();
 	void DestroyVulkanInstance();
+	VkInstance GetVulkanInstance() { return this->mVKInstance; }
 private:
 	void InitDefaultVKInstanceCreateInfo();
 	void CheckVulkanExtensionSupport();

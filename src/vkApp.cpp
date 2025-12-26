@@ -6,6 +6,7 @@ void VulkanApp::run()
 	initWindow();
 	initVulkan();
 	initVulkanInstance();
+	initDevice();
 	
 	mainLoop();
 	cleanUp();
@@ -39,16 +40,9 @@ void VulkanApp::initVulkanInstance()
 	this->vkInstance.CreateVulkanInstance();
 }
 
-void VulkanApp::pickPhysicalDevice()
+void VulkanApp::initDevice()
 {
-	this->vkPhysicalDevice.PickPhysicalDevice(this->vkInstance.GetVulkanInstance());
-	this->vkPhysicalDevice.FindQueueFamilies(this->vkPhysicalDevice.GetPhysicalDevice());
-}
-
-void VulkanApp::createLogicalDevice()
-{
-	MyQueueFamilyIndices indices = this->vkPhysicalDevice.FindQueueFamilies(this->vkPhysicalDevice.GetPhysicalDevice());
-	this->vkLogicalDevice.CreateLogicalDevice(indices, this->vkPhysicalDevice.GetPhysicalDevice());
+	this->vkDevice.InitDevice(this->vkInstance.GetVulkanInstance());
 }
 
 void VulkanApp::mainLoop()
@@ -63,7 +57,7 @@ void VulkanApp::mainLoop()
 void VulkanApp::cleanUp()
 {
 	//清理资源
-	//清理glfw
+	this->vkDevice.DestroyDevice();
 	this->vkInstance.DestroyVulkanInstance();
 
 	glfwDestroyWindow(window);

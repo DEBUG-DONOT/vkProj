@@ -48,6 +48,8 @@ add_executable(HelloVulkan
     src/mVKPhysicalDevice.cpp
     src/mVKLogicalDevice.cpp
     src/utils.h
+        src/mVKDevice.cpp
+        src/mVKDevice.h
 )
 
 # 7. 头文件路径

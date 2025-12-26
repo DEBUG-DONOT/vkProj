@@ -1,6 +1,6 @@
 #include "mVKInstance.h"
 #include <iostream>
-
+#include <cstring>
 static const std::vector<const char*> validationLayers = {
             "VK_LAYER_KHRONOS_validation"};
 

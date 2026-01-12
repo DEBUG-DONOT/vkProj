@@ -15,6 +15,7 @@ private:
 	void initVulkanInstance();
 	//void pickPhysicalDevice();
 	//void createLogicalDevice();
+	void initSurface();
 	void initDevice();
 	void mainLoop();
 	void cleanUp();

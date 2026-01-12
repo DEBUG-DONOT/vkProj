@@ -10,17 +10,18 @@
  */
 #include <vulkan/vulkan.h>
 #include "utils.h"
+
 class mVKDevice
 {
 public:
-    void InitDevice(VkInstance instance);
+    void InitDevice(VkInstance instance,VkSurfaceKHR surface);
     void DestroyDevice();
 private:
     void PickPhysicalDevice(VkInstance instance);
     void CreateLogicalDevice(MyQueueFamilyIndices index, VkPhysicalDevice physicalDevice);
     void GetGraphicsQueues(MyQueueFamilyIndices index,VkDevice device);
 private:
-    MyQueueFamilyIndices FindQueueFamilies(VkPhysicalDevice _device);
+    MyQueueFamilyIndices FindQueueFamilies(VkPhysicalDevice _device,VkSurfaceKHR surface);
     uint32_t RatePhysicalDevice(VkPhysicalDevice _device);
 private:
     //需要默认赋值为空

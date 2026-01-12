@@ -5,6 +5,7 @@ void VulkanApp::run()
 {
 	initWindow();
 	initVulkan();
+	initSurface();
 	initVulkanInstance();
 	initDevice();
 	
@@ -40,9 +41,15 @@ void VulkanApp::initVulkanInstance()
 	this->vkInstance.CreateVulkanInstance();
 }
 
+void VulkanApp::initSurface()
+{
+	//创建surface，GLFW提供了跨平台的创建方式
+	this->vkInstance.CreateVulkanSurface(this->window);
+}
+
 void VulkanApp::initDevice()
 {
-	this->vkDevice.InitDevice(this->vkInstance.GetVulkanInstance());
+	this->vkDevice.InitDevice(this->vkInstance.GetVulkanInstance(),this->vkInstance.GetVulkanSurface());
 }
 
 void VulkanApp::mainLoop()
@@ -58,6 +65,7 @@ void VulkanApp::cleanUp()
 {
 	//清理资源
 	this->vkDevice.DestroyDevice();
+	this->vkInstance.DestroyVulkanSurface();//清理surface
 	this->vkInstance.DestroyVulkanInstance();
 
 	glfwDestroyWindow(window);

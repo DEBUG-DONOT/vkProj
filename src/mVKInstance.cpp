@@ -4,6 +4,10 @@
 static const std::vector<const char*> validationLayers = {
             "VK_LAYER_KHRONOS_validation"};
 
+static const std::vector<const char*> deviceExtensions = {
+            "VK_KHR_surface",
+            "VK_KHR_win32_surface" };
+
 void mVKInstace::CreateVulkanInstance(VkInstanceCreateInfo _vkInstanceCreateInfo)
 {
     //几乎所有的vulkan的create函数都返回VkResult类型，并且都需要一个structure作为参数传递信息，接受一个指针作为alloctor，还有一个输出指针
@@ -33,13 +37,25 @@ void mVKInstace::DestroyVulkanInstance()
     vkDestroyInstance(this->mVKInstance, nullptr);
 }
 
+void mVKInstace::CreateVulkanSurface(GLFWwindow* window)
+{
+    //使用glfw可以规避平台相关的代码
+    if (glfwCreateWindowSurface(this->mVKInstance, window, nullptr, &this->mVulkanSurface) != VK_SUCCESS) {
+        std::cerr << "Failed to create window surface!" << std::endl;
+    }
+}
+
+void mVKInstace::DestroyVulkanSurface()
+{
+    vkDestroySurfaceKHR(this->mVKInstance, this->mVulkanSurface, nullptr);
+}
+
 void mVKInstace::InitDefaultVKInstanceCreateInfo()
 {
     //TODO：改为使用临时变量，不使用成员变量
     //初始化默认的vkinstancecreateinfo结构体
     //app info
     this->mDefaultVKApplicationInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-    //this->mDefaultVKApplicationInfo.sType = VK_STRUCTURE_TYPE_CALIBRATED_TIMESTAMP_INFO_EXT;
     this->mDefaultVKApplicationInfo.pNext = nullptr;
     this->mDefaultVKApplicationInfo.pApplicationName = "VulkanApp";
     this->mDefaultVKApplicationInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
@@ -67,8 +83,8 @@ void mVKInstace::InitDefaultVKInstanceCreateInfo()
         this->mDefaultVKInstanceCreateInfo.ppEnabledLayerNames = nullptr;
     }
     //启用拓展  
-    this->mDefaultVKInstanceCreateInfo.enabledExtensionCount = 0;
-    this->mDefaultVKInstanceCreateInfo.ppEnabledExtensionNames = nullptr;//指向扩展名字符串数组的指针
+    this->mDefaultVKInstanceCreateInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
+    this->mDefaultVKInstanceCreateInfo.ppEnabledExtensionNames = deviceExtensions.data();
 }
 
 void mVKInstace::CheckVulkanExtensionSupport()

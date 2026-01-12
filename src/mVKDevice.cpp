@@ -6,11 +6,11 @@
 #include <iostream>
 #include <vector>
 #include <map>
-void mVKDevice::InitDevice(VkInstance instance)
+void mVKDevice::InitDevice(VkInstance instance,VkSurfaceKHR surface)
 {
     //作为对外的接口，负责physical device和logical device的整体初始化流程
     PickPhysicalDevice(instance);
-    auto indices= FindQueueFamilies(this->physicalDevice);
+    auto indices= FindQueueFamilies(this->physicalDevice,surface);
     CreateLogicalDevice(indices, physicalDevice);
     GetGraphicsQueues( indices,this->logicalDevice);
 }
@@ -82,16 +82,24 @@ void mVKDevice::GetGraphicsQueues(MyQueueFamilyIndices index,VkDevice device)
 }
 
 
-MyQueueFamilyIndices mVKDevice::FindQueueFamilies(VkPhysicalDevice _device)
+MyQueueFamilyIndices mVKDevice::FindQueueFamilies(VkPhysicalDevice _device,VkSurfaceKHR surface)
 {
     MyQueueFamilyIndices indices;
     uint32_t queueFamilyCount = 0;
     vkGetPhysicalDeviceQueueFamilyProperties(_device, &queueFamilyCount, nullptr);
     std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
     vkGetPhysicalDeviceQueueFamilyProperties(_device, &queueFamilyCount, queueFamilies.data());
+
     for (uint32_t i = 0; i < queueFamilies.size(); i++) {
+        //check graphics support
         if (queueFamilies[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) {
             indices.graphicsFamily = i;
+        }
+        //check present support
+        VkBool32 presentSupport = false;
+        vkGetPhysicalDeviceSurfaceSupportKHR(_device,i,/*surface*/surface, &presentSupport);
+        if (presentSupport) {
+            indices.presentFamily = i;
         }
         if (indices.isComplete()) {
             break;

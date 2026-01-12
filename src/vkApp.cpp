@@ -5,8 +5,8 @@ void VulkanApp::run()
 {
 	initWindow();
 	initVulkan();
-	initSurface();
 	initVulkanInstance();
+	initSurface();
 	initDevice();
 	
 	mainLoop();
@@ -22,12 +22,12 @@ void VulkanApp::initWindow()
 	//glfw create window
 	window = glfwCreateWindow(VulkanApp::WIDTH, VulkanApp::HEIGHT, "Vulkan Window", nullptr, nullptr);
 	std::cout << "VulkanApp::Init Window function" << std::endl;
-	uint32_t extensionCount = 0;
-	const char** extensions = glfwGetRequiredInstanceExtensions(&extensionCount);
-	std::cout << "Required GLFW extensions:" << std::endl;
-	for (uint32_t i = 0; i < extensionCount; i++) {
-		std::cout << "\t" << extensions[i] << std::endl;
-	}
+	// uint32_t extensionCount = 0;
+	// const char** extensions = glfwGetRequiredInstanceExtensions(&extensionCount);
+	// std::cout << "Required GLFW extensions:" << std::endl;
+	// for (uint32_t i = 0; i < extensionCount; i++) {
+	// 	std::cout << "\t" << extensions[i] << std::endl;
+	// }
 }
 
 void VulkanApp::initVulkan()
@@ -44,6 +44,7 @@ void VulkanApp::initVulkanInstance()
 void VulkanApp::initSurface()
 {
 	//创建surface，GLFW提供了跨平台的创建方式
+	std::cout << "VulkanApp::Init surface function" << std::endl;
 	this->vkInstance.CreateVulkanSurface(this->window);
 }
 

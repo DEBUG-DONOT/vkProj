@@ -4,9 +4,7 @@
 static const std::vector<const char*> validationLayers = {
             "VK_LAYER_KHRONOS_validation"};
 
-static const std::vector<const char*> deviceExtensions = {
-            "VK_KHR_surface",
-            "VK_KHR_win32_surface" };
+
 
 void mVKInstace::CreateVulkanInstance(VkInstanceCreateInfo _vkInstanceCreateInfo)
 {
@@ -82,9 +80,11 @@ void mVKInstace::InitDefaultVKInstanceCreateInfo()
         this->mDefaultVKInstanceCreateInfo.enabledLayerCount = 0;
         this->mDefaultVKInstanceCreateInfo.ppEnabledLayerNames = nullptr;
     }
-    //启用拓展  
-    this->mDefaultVKInstanceCreateInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
-    this->mDefaultVKInstanceCreateInfo.ppEnabledExtensionNames = deviceExtensions.data();
+    //启用拓展
+    uint32_t extensionCount = 0;
+    const char** extensions = glfwGetRequiredInstanceExtensions(&extensionCount);
+    this->mDefaultVKInstanceCreateInfo.enabledExtensionCount = extensionCount;
+    this->mDefaultVKInstanceCreateInfo.ppEnabledExtensionNames = extensions;
 }
 
 void mVKInstace::CheckVulkanExtensionSupport()
@@ -106,10 +106,10 @@ bool mVKInstace::CheckVulkanLayerSupport(std::vector<const char *> _layerNames, 
     vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
     std::vector<VkLayerProperties> availableLayers(layerCount);
     vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
-    std::cout << "Available Vulkan layer:" << std::endl;
-    for (const auto& _layer : availableLayers) {
-        std::cout << "\t" << _layer.layerName << std::endl;
-    }
+    // std::cout << "Available Vulkan layer:" << std::endl;
+    // for (const auto& _layer : availableLayers) {
+    //     std::cout << "\t" << _layer.layerName << std::endl;
+    // }
 // 2. 修正逻辑：外层循环遍历“请求的层”，内层遍历“可用的层”
     for (uint32_t i = 0; i < _layerCount; i++) {
         bool layerFound = false;

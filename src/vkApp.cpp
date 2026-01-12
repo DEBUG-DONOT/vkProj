@@ -19,6 +19,7 @@ void VulkanApp::initWindow()
 	glfwInit();
 	//window hint
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 	//glfw create window
 	window = glfwCreateWindow(VulkanApp::WIDTH, VulkanApp::HEIGHT, "Vulkan Window", nullptr, nullptr);
 	std::cout << "VulkanApp::Init Window function" << std::endl;

@@ -18,8 +18,12 @@ public:
     void DestroyDevice();
 private:
     void PickPhysicalDevice(VkInstance instance);
+    void CheckPhysicalDeviceExtensionSupport(VkPhysicalDevice physicalDevice);
+    //void EnablePhysicalDeviceExtension(VkPhysicalDevice physicalDevice);
+
     void CreateLogicalDevice(MyQueueFamilyIndices index, VkPhysicalDevice physicalDevice);
     void GetGraphicsQueues(MyQueueFamilyIndices index,VkDevice device);
+    void GetPresentQueues(MyQueueFamilyIndices index,VkDevice device);
 private:
     MyQueueFamilyIndices FindQueueFamilies(VkPhysicalDevice _device,VkSurfaceKHR surface);
     uint32_t RatePhysicalDevice(VkPhysicalDevice _device);
@@ -28,6 +32,7 @@ private:
     VkPhysicalDevice physicalDevice=VK_NULL_HANDLE;
     VkDevice logicalDevice=VK_NULL_HANDLE;
     VkQueue graphicsQueue=VK_NULL_HANDLE;
+    VkQueue presentQueue=VK_NULL_HANDLE;
 };
 
 

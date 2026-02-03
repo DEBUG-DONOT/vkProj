@@ -6,6 +6,14 @@
 #include <iostream>
 #include <vector>
 #include <map>
+#include <set>
+#include <string>
+
+std::vector<const char*> enabledExtensions = {
+    VK_KHR_SWAPCHAIN_EXTENSION_NAME
+  };
+
+
 void mVKDevice::InitDevice(VkInstance instance,VkSurfaceKHR surface)
 {
     //作为对外的接口，负责physical device和logical device的整体初始化流程
@@ -13,6 +21,7 @@ void mVKDevice::InitDevice(VkInstance instance,VkSurfaceKHR surface)
     auto indices= FindQueueFamilies(this->physicalDevice,surface);
     CreateLogicalDevice(indices, physicalDevice);
     GetGraphicsQueues( indices,this->logicalDevice);
+    GetPresentQueues( indices,this->logicalDevice);
 }
 
 void mVKDevice::DestroyDevice()
@@ -41,6 +50,7 @@ void mVKDevice::PickPhysicalDevice(VkInstance instance)
     {
         this->physicalDevice=rankedDevices.rbegin()->second;
         std::cout<<"Physical device: "<<this->physicalDevice<<std::endl;
+        CheckPhysicalDeviceExtensionSupport(this->physicalDevice);
     }
     else
     {
@@ -48,22 +58,75 @@ void mVKDevice::PickPhysicalDevice(VkInstance instance)
     }
 }
 
+/**
+ * 检测物理设备支持哪些拓展
+ * @param physicalDevice 物理设备handle
+ */
+void mVKDevice::CheckPhysicalDeviceExtensionSupport(VkPhysicalDevice physicalDevice)
+{
+    uint32_t extensionCount = 0;
+    vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extensionCount, nullptr);
+    std::vector<VkExtensionProperties> extensions(extensionCount);
+    vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extensionCount, extensions.data());
+    // for (auto proposedExtension : extensions)
+    // {
+    //     std::cout << proposedExtension.extensionName << std::endl;
+    // }
+    //检测我们需要的extension是否都支持，教程中的设计是放在判断physical device是否合规的判断中，但是由于是在本地跑，可以放弃那一段逻辑
+    std::set<std::string> enabledExtensionsString(enabledExtensions.begin(), enabledExtensions.end());
+    for (auto& extension : extensions)
+    {
+        enabledExtensionsString.erase(extension.extensionName);
+    }
+    if (!enabledExtensionsString.empty())
+    {
+        std::cerr<<"The following extensions were not found:"<<std::endl;
+        for (auto& extension : enabledExtensionsString)
+        {
+            std::cout<<extension<<std::endl;
+        }
+        std::cerr<<"Please check the following extensions:"<<std::endl;
+    }
+    else
+    {
+        std::cout<<"==================Extension all found:===================="<<std::endl;
+        for (auto extension : enabledExtensions)
+        {
+            std::cout<<std::string (extension)<<std::endl;
+        }
+        std::cout<<"====================End=================="<<std::endl;
+    }
+}
+
 
 void mVKDevice::CreateLogicalDevice(MyQueueFamilyIndices index, VkPhysicalDevice physicalDevice)
 {
-    VkDeviceQueueCreateInfo queueCreateInfo{};
-    queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-    queueCreateInfo.queueFamilyIndex = index.graphicsFamily.value();
-    queueCreateInfo.queueCount = 1;
-    queueCreateInfo.pQueuePriorities = new float[1]{1.0f};
+    std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
+    std::set<uint32_t> uniqueQueueFamilyIndices{index.graphicsFamily.value(),index.presentFamily.value()};
+    for (auto uniqueQueueFamilyIndex : uniqueQueueFamilyIndices)
+    {
+        VkDeviceQueueCreateInfo queueCreateInfo{};
+        queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+        queueCreateInfo.queueFamilyIndex = uniqueQueueFamilyIndex;
+        queueCreateInfo.queueCount = 1;
+        queueCreateInfo.pQueuePriorities = new float[1]{1.0f};
+        queueCreateInfos.push_back(queueCreateInfo);
+    }
+    // queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+    // queueCreateInfo.queueFamilyIndex = index.graphicsFamily.value();
+    // queueCreateInfo.queueCount = 1;
+    // queueCreateInfo.pQueuePriorities = new float[1]{1.0f};
 
     VkPhysicalDeviceFeatures deviceFeatures{}; // 可以根据需要启用特性
+    std::vector<const char*> deviceEnableExtensions{};
 
     VkDeviceCreateInfo deviceCreateInfoLocal{};
     deviceCreateInfoLocal.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-    deviceCreateInfoLocal.pQueueCreateInfos = &queueCreateInfo;
-    deviceCreateInfoLocal.queueCreateInfoCount = 1;
+    deviceCreateInfoLocal.pQueueCreateInfos = queueCreateInfos.data();
+    deviceCreateInfoLocal.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
     deviceCreateInfoLocal.pEnabledFeatures = &deviceFeatures;
+    deviceCreateInfoLocal.enabledExtensionCount=static_cast<uint32_t>(enabledExtensions.size());
+    deviceCreateInfoLocal.ppEnabledExtensionNames = enabledExtensions.data();
 
     VkResult result = vkCreateDevice(physicalDevice, &deviceCreateInfoLocal, nullptr, &this->logicalDevice);
     if (result != VK_SUCCESS)
@@ -79,6 +142,11 @@ void mVKDevice::CreateLogicalDevice(MyQueueFamilyIndices index, VkPhysicalDevice
 void mVKDevice::GetGraphicsQueues(MyQueueFamilyIndices index,VkDevice device)
 {
     vkGetDeviceQueue(device, index.graphicsFamily.value(), 0, &this->graphicsQueue);
+}
+
+void mVKDevice::GetPresentQueues(MyQueueFamilyIndices index, VkDevice device)
+{
+    vkGetDeviceQueue(device, index.presentFamily.value(), 0, &this->presentQueue);
 }
 
 

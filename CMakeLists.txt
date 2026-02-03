@@ -50,6 +50,9 @@ add_executable(HelloVulkan
     src/utils.h
         src/mVKDevice.cpp
         src/mVKDevice.h
+        src/mVKSwapchain.h
+        src/mVKSwapchain.cpp
+
 )
 
 # 7. 头文件路径

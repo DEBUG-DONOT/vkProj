@@ -16,16 +16,17 @@ class mVKDevice
 public:
     void InitDevice(VkInstance instance,VkSurfaceKHR surface);
     void DestroyDevice();
+    MyQueueFamilyIndices FindQueueFamilies(VkPhysicalDevice _device,VkSurfaceKHR surface);
+    inline VkDevice GetDevice(){return this->logicalDevice;};
+    inline VkPhysicalDevice GetPhysicalDevice(){return this->physicalDevice;};
 private:
     void PickPhysicalDevice(VkInstance instance);
     void CheckPhysicalDeviceExtensionSupport(VkPhysicalDevice physicalDevice);
     //void EnablePhysicalDeviceExtension(VkPhysicalDevice physicalDevice);
-
     void CreateLogicalDevice(MyQueueFamilyIndices index, VkPhysicalDevice physicalDevice);
     void GetGraphicsQueues(MyQueueFamilyIndices index,VkDevice device);
     void GetPresentQueues(MyQueueFamilyIndices index,VkDevice device);
 private:
-    MyQueueFamilyIndices FindQueueFamilies(VkPhysicalDevice _device,VkSurfaceKHR surface);
     uint32_t RatePhysicalDevice(VkPhysicalDevice _device);
 private:
     //需要默认赋值为空

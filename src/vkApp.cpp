@@ -8,7 +8,7 @@ void VulkanApp::run()
 	initVulkanInstance();
 	initSurface();
 	initDevice();
-	
+	initSwapChain();
 	mainLoop();
 	cleanUp();
 }
@@ -54,6 +54,13 @@ void VulkanApp::initDevice()
 	this->vkDevice.InitDevice(this->vkInstance.GetVulkanInstance(),this->vkInstance.GetVulkanSurface());
 }
 
+void VulkanApp::initSwapChain()
+{
+	//检查swapchain和surface的对接关系
+	this->vkSwapChain.InitSwapChain(this->vkInstance.GetVulkanSurface(),this->vkDevice.GetPhysicalDevice(),
+		this->vkDevice.GetDevice(),window,this->vkDevice.FindQueueFamilies(vkDevice.GetPhysicalDevice(),vkInstance.GetVulkanSurface()));
+}
+
 void VulkanApp::mainLoop()
 {
 	//主循环
@@ -66,6 +73,7 @@ void VulkanApp::mainLoop()
 void VulkanApp::cleanUp()
 {
 	//清理资源
+	this->vkSwapChain.DestroySwapChain(this->vkDevice.GetDevice());
 	this->vkDevice.DestroyDevice();
 	this->vkInstance.DestroyVulkanSurface();//清理surface
 	this->vkInstance.DestroyVulkanInstance();

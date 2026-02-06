@@ -3,6 +3,7 @@
 #include <GLFW/glfw3.h>
 #include "mVKInstance.h"
 #include "mVKDevice.h"
+#include "mVKSwapChain.h"
 class VulkanApp
 {
 public:
@@ -17,6 +18,7 @@ private:
 	//void createLogicalDevice();
 	void initSurface();
 	void initDevice();
+	void initSwapChain();
 	void mainLoop();
 	void cleanUp();
 	
@@ -28,5 +30,6 @@ private:
 private:
     mVKInstace vkInstance;//Vulkan实例封装类
 	mVKDevice vkDevice;//physical device 和logical device的封装类
+	mVKSwapchain vkSwapChain;//swapchian
 
 };

@@ -1,0 +1,14 @@
+//
+// Created by 87784 on 2026/2/8.
+//
+
+#ifndef HELLOVULKAN_MVKRENDERPIPELINE_H
+#define HELLOVULKAN_MVKRENDERPIPELINE_H
+
+
+class mVKRenderPipeline
+{
+};
+
+
+#endif //HELLOVULKAN_MVKRENDERPIPELINE_H

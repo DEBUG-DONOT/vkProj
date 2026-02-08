@@ -66,7 +66,7 @@ void mVKSwapchain::InitSwapChain(VkSurfaceKHR surface,VkPhysicalDevice physical_
     {
         std::cerr<<"failed to create swapchain"<<std::endl;
     }
-    //创建image handle
+    //获取image handle
     vkGetSwapchainImagesKHR(logical_device,swapChain,&imageCount,nullptr);
     this->swapChainImages.resize(imageCount);
     result = vkGetSwapchainImagesKHR(logical_device,swapChain,&imageCount,this->swapChainImages.data());

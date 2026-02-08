@@ -52,6 +52,14 @@ add_executable(HelloVulkan
         src/mVKDevice.h
         src/mVKSwapchain.h
         src/mVKSwapchain.cpp
+        src/mVKRenderPass.cpp
+        src/mVKRenderPass.h
+        src/mVKRenderPipeline.cpp
+        src/mVKRenderPipeline.h
+        src/mVKRenderPipelineBuilder.cpp
+        src/mVKRenderPipelineBuilder.h
+        src/mVKShader.cpp
+        src/mVKShader.h
 
 )
 
